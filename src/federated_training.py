@@ -20,8 +20,8 @@ def run_federated_learning(rounds=5, num_clients=5):
             model_copy = create_model()
             model_copy.set_weights(server.global_model.get_weights())
 
-            updated_weights = client.train(model_copy)
-            client_weights.append(updated_weights)
+            updated = client.train(model_copy)
+            client_weights.append(updated)
 
         server.aggregate(client_weights)
 

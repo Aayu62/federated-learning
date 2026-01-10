@@ -4,10 +4,17 @@ class Server:
     def __init__(self, model):
         self.global_model = model
 
-    def aggregate(self, client_weights):
+    def aggregate(self, client_updates):
+        weights = [update["weights"] for update in client_updates]
+        sizes = [update["size"] for update in client_updates]
+
+        total_size = sum(sizes)
         new_weights = []
-        for weights_list_tuple in zip(*client_weights):
-            new_weights.append(
-                np.mean(np.array(weights_list_tuple), axis=0)
-            )
+
+        for layer_weights in zip(*weights):
+            weighted_sum = np.sum([layer * (size / total_size)
+                                   for layer, size in zip(layer_weights, sizes)],
+                                  axis=0)
+            new_weights.append(weighted_sum)
+
         self.global_model.set_weights(new_weights)
